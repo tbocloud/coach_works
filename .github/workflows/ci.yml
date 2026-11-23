@@ -9,8 +9,11 @@ on:
   pull_request:
 
 concurrency:
-  group: develop-coach_works-${{ github.event.number }}
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
   cancel-in-progress: true
+
+env:
+  DB_ROOT_PASSWORD: root
 
 jobs:
   tests:
@@ -29,16 +32,16 @@ jobs:
         ports:
           - 11000:6379
       mariadb:
-        image: mariadb:10.6
+        image: mariadb:11.8
         env:
-          MYSQL_ROOT_PASSWORD: root
+          MARIADB_ROOT_PASSWORD: root
         ports:
           - 3306:3306
-        options: --health-cmd="mariadb-admin ping" --health-interval=5s --health-timeout=2s --health-retries=3
+        options: --health-cmd="healthcheck.sh --connect --innodb_initialized" --health-interval=5s --health-timeout=2s --health-retries=3
 
     steps:
       - name: Clone
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Find tests
         run: |
@@ -46,12 +49,12 @@ jobs:
           grep -rn "def test" > /dev/null
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.14'
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 24
           check-latest: true
@@ -78,7 +81,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install MariaDB Client
-        run: sudo apt-get install -y mariadb-client
+        run: sudo apt-get install -y mariadb-client libmariadb-dev
 
       - name: Setup
         run: |
@@ -92,7 +95,7 @@ jobs:
         run: |
           bench get-app coach_works $GITHUB_WORKSPACE
           bench setup requirements --dev
-          bench new-site --db-root-password root --admin-password admin test_site
+          bench new-site --db-type mariadb --db-host 127.0.0.1 --db-root-password root --admin-password admin test_site
           bench --site test_site install-app coach_works
           bench build
         env:
