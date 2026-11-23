@@ -8,18 +8,23 @@ app_license = "mit"
 # Apps
 # ------------------
 
-# required_apps = []
+required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "coach_works",
-# 		"logo": "/assets/coach_works/logo.png",
-# 		"title": "Coach Works",
-# 		"route": "/coach_works",
-# 		"has_permission": "coach_works.api.permission.has_app_permission"
-# 	}
-# ]
+add_to_apps_screen = [
+	{
+		"name": "coach_works",
+		"logo": "/assets/coach_works/logo.svg",
+		"title": "Coach Works",
+		"route": "/desk/job-work",
+	}
+]
+
+# Installation
+# ------------
+
+after_install = "coach_works.install.after_install"
+after_migrate = "coach_works.install.after_migrate"
 
 # Includes in <head>
 # ------------------
@@ -83,7 +88,6 @@ app_license = "mit"
 # ------------
 
 # before_install = "coach_works.install.before_install"
-# after_install = "coach_works.install.after_install"
 
 # Uninstallation
 # ------------

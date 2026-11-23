@@ -1,0 +1,19 @@
+{
+ "app": "coach_works",
+ "creation": "2026-11-23 12:00:21.156206",
+ "docstatus": 0,
+ "doctype": "Desktop Icon",
+ "hidden": 0,
+ "icon_type": "App",
+ "idx": 20,
+ "label": "Coach Works",
+ "link": "/desk/job-work",
+ "link_type": "External",
+ "logo_url": "/assets/coach_works/logo.svg",
+ "modified": "2026-11-23 12:00:21.156206",
+ "modified_by": "Administrator",
+ "name": "Coach Works",
+ "owner": "Administrator",
+ "roles": [],
+ "standard": 1
+}

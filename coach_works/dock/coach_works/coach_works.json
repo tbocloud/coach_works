@@ -1,0 +1,31 @@
+{
+ "app": "coach_works",
+ "creation": "2026-11-23 12:00:21.156206",
+ "docstatus": 0,
+ "doctype": "Dock",
+ "idx": 0,
+ "items": [
+  {
+   "added": 0,
+   "hidden": 0,
+   "icon": "wrench",
+   "link_to": "Job Work",
+   "link_type": "Sidebar",
+   "title": "Job Work"
+  },
+  {
+   "added": 0,
+   "hidden": 0,
+   "icon": "chart-column",
+   "link_to": "Coach Works Reports",
+   "link_type": "Sidebar",
+   "title": "Coach Works Reports"
+  }
+ ],
+ "modified": "2026-11-23 12:00:21.156206",
+ "modified_by": "Administrator",
+ "name": "coach_works",
+ "owner": "Administrator",
+ "standard": 1,
+ "user": ""
+}
