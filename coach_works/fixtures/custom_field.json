@@ -1,0 +1,15 @@
+[
+ {
+  "doctype": "Custom Field",
+  "dt": "Sales Invoice",
+  "fieldname": "coach_work_order",
+  "fieldtype": "Link",
+  "insert_after": "po_no",
+  "label": "Coach Work Order",
+  "no_copy": 1,
+  "options": "Coach Work Order",
+  "print_hide": 0,
+  "read_only": 1,
+  "translatable": 0
+ }
+]

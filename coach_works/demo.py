@@ -489,6 +489,7 @@ def invoice_order(order, company):
 			"posting_date": add_days(nowdate(), -3),
 			"due_date": add_days(nowdate(), 12),
 			"po_no": order.name,
+			"coach_work_order": order.name,
 			"items": [
 				{
 					"item_code": row.charge,

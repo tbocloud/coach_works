@@ -196,7 +196,7 @@
    "label": "Job Value Trend"
   }
  ],
- "content": "[{\"id\": \"jobw\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\">Job Work</span>\", \"col\": 12}}, {\"id\": \"jobw_sc\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"New Job\", \"col\": 3}}, {\"id\": \"jobw_sc2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Job Work\", \"col\": 3}}, {\"id\": \"jobw_sc3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Vehicles\", \"col\": 3}}, {\"id\": \"jobw_sc4\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Estimates\", \"col\": 3}}, {\"id\": \"jobw_nc1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Jobs In Progress\", \"col\": 3}}, {\"id\": \"jobw_nc2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Jobs Ready for Delivery\", \"col\": 3}}, {\"id\": \"jobw_nc3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Open Job Value\", \"col\": 3}}, {\"id\": \"jobw_nc4\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Vehicles\", \"col\": 3}}, {\"id\": \"jobw_ch1\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Jobs by Stage\", \"col\": 6}}, {\"id\": \"jobw_ch2\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Jobs by Customer\", \"col\": 6}}, {\"id\": \"jobw_ch3\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Job Value Trend\", \"col\": 12}}, {\"id\": \"jobw_c1\", \"type\": \"card\", \"data\": {\"card_name\": \"Job Work\", \"col\": 6}}, {\"id\": \"jobw_c2\", \"type\": \"card\", \"data\": {\"card_name\": \"Masters\", \"col\": 6}}, {\"id\": \"jobw_c3\", \"type\": \"card\", \"data\": {\"card_name\": \"Reports\", \"col\": 6}}, {\"id\": \"jobw_c4\", \"type\": \"card\", \"data\": {\"card_name\": \"Settings\", \"col\": 6}}]",
+ "content": "[{\"id\": \"jobw\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\">Job Work</span>\", \"col\": 12}}, {\"id\": \"jobw_sc\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"New Job\", \"col\": 3}}, {\"id\": \"jobw_sc2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Job Work\", \"col\": 3}}, {\"id\": \"jobw_sc3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Vehicles\", \"col\": 3}}, {\"id\": \"jobw_sc4\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Estimates\", \"col\": 3}}, {\"id\": \"jobw_dash\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Coach Works Dashboard\", \"col\": 3}}, {\"id\": \"jobw_nc1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Jobs In Progress\", \"col\": 3}}, {\"id\": \"jobw_nc2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Jobs Ready for Delivery\", \"col\": 3}}, {\"id\": \"jobw_nc3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Open Job Value\", \"col\": 3}}, {\"id\": \"jobw_nc4\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Vehicles\", \"col\": 3}}, {\"id\": \"jobw_ch1\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Jobs by Stage\", \"col\": 6}}, {\"id\": \"jobw_ch2\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Jobs by Customer\", \"col\": 6}}, {\"id\": \"jobw_ch3\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Job Value Trend\", \"col\": 12}}, {\"id\": \"jobw_c1\", \"type\": \"card\", \"data\": {\"card_name\": \"Job Work\", \"col\": 6}}, {\"id\": \"jobw_c2\", \"type\": \"card\", \"data\": {\"card_name\": \"Masters\", \"col\": 6}}, {\"id\": \"jobw_c3\", \"type\": \"card\", \"data\": {\"card_name\": \"Reports\", \"col\": 6}}, {\"id\": \"jobw_c4\", \"type\": \"card\", \"data\": {\"card_name\": \"Settings\", \"col\": 6}}]",
  "creation": "2026-11-23 13:25:00.000000",
  "custom_blocks": [],
  "docstatus": 0,
@@ -251,7 +251,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-11-23 14:15:00.000000",
+ "modified": "2026-11-23 14:35:00.000000",
  "modified_by": "Administrator",
  "module": "Job Work",
  "name": "Job Work",
@@ -320,7 +320,15 @@
    "label": "Estimates",
    "link_to": "Job Work Estimate",
    "type": "DocType"
+  },
+  {
+   "doctype": "Workspace Shortcut",
+   "icon": "layout-dashboard",
+   "label": "Coach Works Dashboard",
+   "link_to": "Coach Works",
+   "type": "Dashboard"
   }
  ],
- "title": "Job Work"
+ "title": "Job Work",
+ "type": "Workspace"
 }

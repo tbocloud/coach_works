@@ -28,6 +28,10 @@ after_migrate = "coach_works.install.after_migrate"
 
 fixtures = [
 	{"dt": "Role", "filters": [["role", "in", ["Job Work Manager", "Job Work User"]]]},
+	{
+		"dt": "Custom Field",
+		"filters": [["dt", "=", "Sales Invoice"], ["fieldname", "=", "coach_work_order"]],
+	},
 ]
 
 # DocType JS for the job board
