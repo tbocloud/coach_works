@@ -24,7 +24,6 @@ DEFAULTS = {
 	"Coach Works Settings": {
 		"company": None,
 		"default_stage": "Enquiry",
-		"default_work_stage": "Fabrication",
 		"enable_estimate_approval": 1,
 	},
 	"Vehicle Type": [{"doctype": "Vehicle Type", "vehicle_type": v} for v in VEHICLE_TYPES],
@@ -42,6 +41,8 @@ def after_migrate():
 
 
 def _sync_work_stages():
+	if not frappe.db.exists("DocType", "Work Stage"):
+		return
 	for idx, (stage, color, status) in enumerate(STAGES, start=1):
 		if frappe.db.exists("Work Stage", stage):
 			continue
@@ -57,6 +58,8 @@ def _sync_work_stages():
 
 
 def _sync_vehicle_types():
+	if not frappe.db.exists("DocType", "Vehicle Type"):
+		return
 	for row in DEFAULTS["Vehicle Type"]:
 		if frappe.db.exists("Vehicle Type", row["vehicle_type"]):
 			continue
@@ -66,6 +69,8 @@ def _sync_vehicle_types():
 
 
 def _sync_settings():
+	if not frappe.db.exists("DocType", "Coach Works Settings"):
+		return
 	if frappe.db.exists("Coach Works Settings", "Coach Works Settings"):
 		return
 	values = dict(DEFAULTS["Coach Works Settings"])
