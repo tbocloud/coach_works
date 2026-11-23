@@ -85,7 +85,9 @@ def upsert(doctype, doc, label=None):
 		)
 		verb = "updated"
 	else:
-		code, data = call("POST", f"/api/resource/{urllib.parse.quote(doctype, safe='')}", payload, http="POST")
+		code, data = call(
+			"POST", f"/api/resource/{urllib.parse.quote(doctype, safe='')}", payload, http="POST"
+		)
 		verb = "created"
 	if code not in (200, 201):
 		print(f"  FAIL {label} ({code}): {str(data)[:300]}")
