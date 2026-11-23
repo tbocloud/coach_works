@@ -15,7 +15,7 @@
  "name": "Jobs In Progress",
  "owner": "Administrator",
  "prepared_report": 0,
- "query": "select\n\tcwo.name as \"Job:Link/Coach Work Order:150\",\n\tcwo.customer_name as \"Customer::180\",\n\tv.registration_no as \"Vehicle:Link/Vehicle:130\",\n\tcwo.stage as \"Stage:Link/Work Stage:140\",\n\tcwo.posting_date as \"Job Date:Date:110\",\n\tcwo.expected_delivery_date as \"Expected Delivery:Date:140\",\n\tcwo.total_amount as \"Amount:Currency:120\"\nfrom `tabCoach Work Order` cwo\nleft join `tabVehicle` v on v.name = cwo.vehicle\nwhere cwo.docstatus = 1 and cwo.status = 'Open'\norder by cwo.expected_delivery_date asc",
+ "query": "select\n\tcwo.name as \"Job:Link/Coach Work Order:150\",\n\tcwo.customer_name as \"Customer::180\",\n\tv.registration_no as \"Vehicle:Link/Coach Work Vehicle:130\",\n\tcwo.stage as \"Stage:Link/Work Stage:140\",\n\tcwo.posting_date as \"Job Date:Date:110\",\n\tcwo.expected_delivery_date as \"Expected Delivery:Date:140\",\n\tcwo.total_amount as \"Amount:Currency:120\"\nfrom `tabCoach Work Order` cwo\nleft join `tabCoach Work Vehicle` v on v.name = cwo.vehicle\nwhere cwo.docstatus = 1 and cwo.status = 'Open'\norder by cwo.expected_delivery_date asc",
  "ref_doctype": "Coach Work Order",
  "report_name": "Jobs In Progress",
  "report_type": "Query Report",

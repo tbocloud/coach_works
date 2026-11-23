@@ -16,7 +16,7 @@
       "is_query_report": 0,
       "label": "Coach Work Order",
       "link_count": 0,
-      "link_to": "CoachWorkOrder",
+      "link_to": "Coach Work Order",
       "link_type": "DocType",
       "onboard": 0,
       "type": "Link"
@@ -30,7 +30,7 @@
       "is_query_report": 0,
       "label": "Vehicle",
       "link_count": 0,
-      "link_to": "Vehicle",
+      "link_to": "Coach Work Vehicle",
       "link_type": "DocType",
       "onboard": 0,
       "type": "Link"
@@ -44,7 +44,7 @@
       "is_query_report": 0,
       "label": "Job Work Estimate",
       "link_count": 0,
-      "link_to": "JobWorkEstimate",
+      "link_to": "Job Work Estimate",
       "link_type": "DocType",
       "onboard": 0,
       "type": "Link"
@@ -66,7 +66,7 @@
       "is_query_report": 0,
       "label": "Vehicle Type",
       "link_count": 0,
-      "link_to": "VehicleType",
+      "link_to": "Vehicle Type",
       "link_type": "DocType",
       "onboard": 0,
       "type": "Link"
@@ -80,7 +80,7 @@
       "is_query_report": 0,
       "label": "Work Stage",
       "link_count": 0,
-      "link_to": "WorkStage",
+      "link_to": "Work Stage",
       "link_type": "DocType",
       "onboard": 0,
       "type": "Link"
@@ -94,7 +94,7 @@
       "is_query_report": 0,
       "label": "Job Work Charge",
       "link_count": 0,
-      "link_to": "JobWorkCharge",
+      "link_to": "Job Work Charge",
       "link_type": "DocType",
       "onboard": 0,
       "type": "Link"
@@ -166,7 +166,7 @@
       "is_query_report": 0,
       "label": "Coach Work Settings",
       "link_count": 0,
-      "link_to": "CoachWorkSettings",
+      "link_to": "Coach Work Settings",
       "link_type": "DocType",
       "onboard": 0,
       "type": "Link"
@@ -198,7 +198,7 @@
    "is_query_report": 0,
    "label": "Coach Work Order",
    "link_count": 0,
-   "link_to": "CoachWorkOrder",
+   "link_to": "Coach Work Order",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -212,7 +212,7 @@
    "is_query_report": 0,
    "label": "Vehicle",
    "link_count": 0,
-   "link_to": "Vehicle",
+   "link_to": "Coach Work Vehicle",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -226,7 +226,7 @@
    "is_query_report": 0,
    "label": "Job Work Estimate",
    "link_count": 0,
-   "link_to": "JobWorkEstimate",
+   "link_to": "Job Work Estimate",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -250,7 +250,7 @@
    "icon": "plus",
    "idx": 1,
    "label": "New Job",
-   "link_to": "CoachWorkOrder",
+   "link_to": "Coach Work Order",
    "type": "DocType"
   },
   {
@@ -258,7 +258,7 @@
    "icon": "clipboard-list",
    "idx": 2,
    "label": "Job Work",
-   "link_to": "CoachWorkOrder",
+   "link_to": "Coach Work Order",
    "type": "DocType"
   },
   {
@@ -266,7 +266,7 @@
    "icon": "truck",
    "idx": 3,
    "label": "Vehicles",
-   "link_to": "Vehicle",
+   "link_to": "Coach Work Vehicle",
    "type": "DocType"
   },
   {
@@ -274,7 +274,7 @@
    "icon": "file-text",
    "idx": 4,
    "label": "Estimates",
-   "link_to": "JobWorkEstimate",
+   "link_to": "Job Work Estimate",
    "type": "DocType"
   }
  ],

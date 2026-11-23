@@ -116,3 +116,21 @@ class CoachWorkOrder(Document):
 
 		self.db_set("sales_invoice", invoice.name)
 		return invoice.name
+
+
+@frappe.whitelist()
+def submit_external(doctype, name):
+	"""Submit a job-work document by name.
+
+	The REST API cannot submit (``frappe.client.submit`` reloads the document from the client
+	payload), so sites driven entirely over HTTP need an endpoint that loads and submits the
+	stored document.
+	"""
+	if doctype not in ("Coach Work Order", "Job Work Estimate"):
+		frappe.throw(_("Cannot submit {0} through this endpoint").format(doctype))
+	doc = frappe.get_doc(doctype, name)
+	if doc.docstatus != 0:
+		return doc.docstatus
+	doc.flags.ignore_permissions = False
+	doc.submit()
+	return doc.docstatus

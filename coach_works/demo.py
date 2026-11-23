@@ -21,7 +21,7 @@ CUSTOMERS = [
 		"9820011223",
 		"14, Link Road, Andheri West, Mumbai 400053",
 		"Maharashtra",
-		"27AABCS1429B1ZX",
+		"27AABCS1429B1ZU",
 	),
 	(
 		"Anand Foods Pvt Ltd",
@@ -30,7 +30,7 @@ CUSTOMERS = [
 		"9845098450",
 		"22, Anna Salai, Teynampet, Chennai 600018",
 		"Tamil Nadu",
-		"33AAGCA2587K1Z2",
+		"33AAGCA2587K1ZI",
 	),
 	(
 		"Nair Event Services",
@@ -39,7 +39,7 @@ CUSTOMERS = [
 		"9947001122",
 		"8, MG Road, Kochi 682016",
 		"Kerala",
-		"32AACCN1463M1Z5",
+		"32AACCN1463M1ZI",
 	),
 	(
 		"Gill Transport",
@@ -48,7 +48,7 @@ CUSTOMERS = [
 		"9815567890",
 		"Plot 44, GT Road, Ludhiana 141001",
 		"Punjab",
-		"03AADCG7311P1ZM",
+		"03AADCG7311P1ZK",
 	),
 	(
 		"Iyer Sweets & Snacks",
@@ -57,7 +57,7 @@ CUSTOMERS = [
 		"9900123456",
 		"31, Jayanagar 4th Block, Bengaluru 560011",
 		"Karnataka",
-		"29AAECI4802Q1ZL",
+		"29AAECI4802Q1Z3",
 	),
 	(
 		"Bose Mobile Banking",
@@ -66,7 +66,7 @@ CUSTOMERS = [
 		"9830214567",
 		"7, Park Street, Kolkata 700016",
 		"West Bengal",
-		"19AAFCB6193R1ZK",
+		"19AAFCB6193R1ZS",
 	),
 	(
 		"Patel Wedding Planners",
@@ -75,7 +75,7 @@ CUSTOMERS = [
 		"9925012334",
 		"12, CG Road, Ahmedabad 380009",
 		"Gujarat",
-		"24AAKCP9054L1Z9",
+		"24AAKCP9054L1ZW",
 	),
 	(
 		"Khan Hospitality",
@@ -84,7 +84,7 @@ CUSTOMERS = [
 		"9871234560",
 		"56, Banjara Hills, Hyderabad 500034",
 		"Telangana",
-		"36AAMCK3391N1ZQ",
+		"36AAMCK3391N1ZU",
 	),
 ]
 
@@ -438,12 +438,12 @@ def _make_items():
 def _make_vehicles(company, customers):
 	created = []
 	for reg, vtype, make_model, customer, owner, year, fuel in VEHICLES:
-		if frappe.db.exists("Vehicle", {"registration_no": reg}):
-			created.append(frappe.db.get_value("Vehicle", {"registration_no": reg}, "name"))
+		if frappe.db.exists("Coach Work Vehicle", {"registration_no": reg}):
+			created.append(frappe.db.get_value("Coach Work Vehicle", {"registration_no": reg}, "name"))
 			continue
 		vehicle = frappe.get_doc(
 			{
-				"doctype": "Vehicle",
+				"doctype": "Coach Work Vehicle",
 				"registration_no": reg,
 				"vehicle_type": vtype,
 				"make_model": make_model,
@@ -461,7 +461,7 @@ def _make_vehicles(company, customers):
 
 def _make_estimates(customers, vehicles, items):
 	for reg, customer, _stage, description, charges in JOBS:
-		vehicle = frappe.db.get_value("Vehicle", {"registration_no": reg}, "name")
+		vehicle = frappe.db.get_value("Coach Work Vehicle", {"registration_no": reg}, "name")
 		if not vehicle:
 			continue
 		if frappe.db.exists("Job Work Estimate", {"vehicle": vehicle, "docstatus": 1}):
@@ -494,7 +494,7 @@ def _make_jobs(customers, vehicles, items):
 	rates = dict((c, r) for c, _n, _k, _u, r in ITEMS)
 	made = []
 	for reg, customer, stage, description, charges in JOBS:
-		vehicle = frappe.db.get_value("Vehicle", {"registration_no": reg}, "name")
+		vehicle = frappe.db.get_value("Coach Work Vehicle", {"registration_no": reg}, "name")
 		if not vehicle or frappe.db.exists("Coach Work Order", {"vehicle": vehicle, "docstatus": 1}):
 			continue
 		estimate = frappe.db.get_value("Job Work Estimate", {"vehicle": vehicle, "docstatus": 1}, "name")
