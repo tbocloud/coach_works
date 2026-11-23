@@ -162,6 +162,13 @@ VEHICLES = [
 
 JOBS = [
 	(
+		"KA-05-MJ-3390",
+		"Iyer Sweets & Snacks",
+		"Enquiry",
+		"Mini food truck fitout with cold storage counter.",
+		[("CW-INTERIOR", 1), ("CW-AC-SERVICE", 1)],
+	),
+	(
 		"MH-02-CD-4412",
 		"Sharma Caterers",
 		"Build",
@@ -188,13 +195,6 @@ JOBS = [
 		"Ready",
 		"Side wheel fixing and load body strengthening.",
 		[("CW-SIDEWHEEL", 1), ("CW-BODY-REPAIR", 1)],
-	),
-	(
-		"KA-05-MJ-3390",
-		"Iyer Sweets & Snacks",
-		"Enquiry",
-		"Mini food truck fitout with cold storage counter.",
-		[("CW-INTERIOR", 1), ("CW-AC-SERVICE", 1)],
 	),
 	(
 		"WB-02-AL-5567",
