@@ -1,6 +1,6 @@
 {
  "app": "coach_works",
- "creation": "2026-11-23 12:56:40.115996",
+ "creation": "2026-11-23 12:58:54.469797",
  "docstatus": 0,
  "doctype": "Sidebar",
  "header_icon": "chart-column",
@@ -87,7 +87,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-11-23 12:56:40.115996",
+ "modified": "2026-11-23 12:58:54.469797",
  "modified_by": "Administrator",
  "module": "Job Work",
  "name": "Coach Works Reports",

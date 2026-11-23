@@ -173,7 +173,7 @@ for r in SPEC["rail"]:
 		items=rows(r["items"]),
 	)
 	s = scrub(r["title"])
-	dump(f"{ROOT}/{scrub(r['module'])}/sidebar/{s}/{s}.json", doc)
+	dump(f"{ROOT}/{scrub(SPEC['app'])}/sidebar/{s}/{s}.json", doc)
 
 dock = meta("Dock", SPEC["app"])
 dock.update(
@@ -190,7 +190,7 @@ dock.update(
 		for r in SPEC["rail"]
 	],
 )
-dump(f"{ROOT}/dock/{SPEC['app']}/{SPEC['app']}.json", dock)
+dump(f"{ROOT}/{scrub(SPEC['app'])}/dock/{SPEC['app']}/{SPEC['app']}.json", dock)
 
 first_url = "/desk/" + slug(SPEC["rail"][0]["title"])
 for n, t in enumerate(SPEC["tiles"]):
