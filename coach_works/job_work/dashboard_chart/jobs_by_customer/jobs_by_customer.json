@@ -2,7 +2,7 @@
  "aggregate_function_based_on": "total_amount",
  "based_on": "posting_date",
  "chart_name": "Jobs by Customer",
- "chart_type": "Bar",
+ "chart_type": "Group By",
  "color": null,
  "creation": "2026-11-23 14:10:00.000000",
  "currency": null,
@@ -26,5 +26,6 @@
  "time_interval": "Monthly",
  "timeseries": 0,
  "timespan": "Last Year",
+ "type": "Bar",
  "value_based_on": null
 }

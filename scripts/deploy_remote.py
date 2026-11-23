@@ -26,6 +26,8 @@ APP = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
 DOCTYPE_FILES = sorted(glob.glob(os.path.join(APP, "job_work", "doctype", "*", "*.json")))
 REPORT_FILES = sorted(glob.glob(os.path.join(APP, "job_work", "report", "*", "*.json")))
 WORKSPACE_FILES = sorted(glob.glob(os.path.join(APP, "job_work", "workspace", "*", "*.json")))
+NUMBER_CARD_FILES = sorted(glob.glob(os.path.join(APP, "job_work", "number_card", "*", "*.json")))
+CHART_FILES = sorted(glob.glob(os.path.join(APP, "job_work", "dashboard_chart", "*", "*.json")))
 SIDEBAR_FILES = sorted(glob.glob(os.path.join(APP, "coach_works", "sidebar", "*", "*.json")))
 DOCK_FILES = sorted(glob.glob(os.path.join(APP, "coach_works", "dock", "*", "*.json")))
 ICON_FILES = sorted(glob.glob(os.path.join(APP, "desktop_icon", "*.json")))
@@ -138,6 +140,26 @@ def deploy_reports():
 		upsert("Report", doc)
 
 
+def deploy_dashboard():
+	"""Number Cards and Dashboard Charts.
+
+	The site is not in developer mode, so these are created as site records rather than
+	app-owned ones -- the same constraint that makes a standard Report impossible here.
+	"""
+	print("Number Cards:")
+	for path in NUMBER_CARD_FILES:
+		doc = load(path)
+		doc["is_standard"] = 0
+		doc["module"] = ""
+		upsert("Number Card", doc)
+	print("Dashboard Charts:")
+	for path in CHART_FILES:
+		doc = load(path)
+		doc["is_standard"] = 0
+		doc["module"] = ""
+		upsert("Dashboard Chart", doc)
+
+
 def deploy_workspace():
 	print("Workspace:")
 	for path in WORKSPACE_FILES:
@@ -155,6 +177,7 @@ def deploy_desk():
 
 STEPS = {
 	"doctypes": deploy_doctypes,
+	"dashboard": deploy_dashboard,
 	"reports": deploy_reports,
 	"workspace": deploy_workspace,
 	"desk": deploy_desk,
@@ -181,7 +204,7 @@ def main():
 	if code != 200:
 		sys.exit(f"auth failed: {me}")
 
-	for name in args.only or ["doctypes", "reports", "workspace", "desk"]:
+	for name in args.only or ["doctypes", "dashboard", "reports", "workspace", "desk"]:
 		STEPS[name]()
 
 

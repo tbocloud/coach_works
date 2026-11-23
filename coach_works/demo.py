@@ -122,13 +122,29 @@ def repair_totals():
 	for name in frappe.get_all("Coach Work Order", pluck="name"):
 		doc = frappe.get_doc("Coach Work Order", name)
 		total = compute_total(doc.charges)
-		if doc.total_amount != total:
+		changed = doc.total_amount != total
+		for row in doc.charges:
+			line = (row.qty or 0) * (row.rate or 0)
+			if row.amount != line:
+				# a submitted document cannot be saved again, but the line amount is a
+				# computed display value, so it is written on the row itself
+				frappe.db.set_value("Job Work Charge", row.name, "amount", line, update_modified=False)
+				changed = True
+		if changed:
+			doc.flags.ignore_permissions = True
 			doc.db_set("total_amount", total, update_modified=False)
 			fixed = fixed + 1
 	for name in frappe.get_all("Job Work Estimate", pluck="name"):
 		doc = frappe.get_doc("Job Work Estimate", name)
 		total = compute_total(doc.work_details)
-		if doc.total_amount != total:
+		changed = doc.total_amount != total
+		for row in doc.work_details:
+			line = (row.qty or 0) * (row.rate or 0)
+			if row.amount != line:
+				frappe.db.set_value("Job Work Charge", row.name, "amount", line, update_modified=False)
+				changed = True
+		if changed:
+			doc.flags.ignore_permissions = True
 			doc.db_set("total_amount", total, update_modified=False)
 			fixed = fixed + 1
 	return fixed
@@ -178,6 +194,190 @@ def settle_unpaid_invoices():
 	return paid
 
 
+SALARIES = {
+	"Production Manager": 62000,
+	"Senior Fabricator": 38000,
+	"Painter": 26000,
+	"Accounts Executive": 34000,
+	"Electrician": 27000,
+	"Store Keeper": 24000,
+	"Upholsterer": 28500,
+	"HR Executive": 32000,
+	"Welder": 26500,
+	"Sales Coordinator": 31000,
+}
+
+
+def ensure_component(component, abbr, kind):
+	if frappe.db.exists("Salary Component", component):
+		return
+	doc = frappe.get_doc(
+		{
+			"doctype": "Salary Component",
+			"salary_component": component,
+			"salary_component_abbr": abbr,
+			"type": kind,
+		}
+	)
+	doc.flags.ignore_permissions = True
+	doc.insert()
+
+
+def ensure_holiday_list(company):
+	name = "Unicorn Coach Works Holidays"
+	year = nowdate()[:4]
+	if not frappe.db.exists("Holiday List", name):
+		holiday_list = frappe.get_doc(
+			{
+				"doctype": "Holiday List",
+				"holiday_list_name": name,
+				"from_date": year + "-01-01",
+				"to_date": year + "-12-31",
+				"weekly_off": "Sunday",
+				"holidays": [
+					{"holiday_date": year + "-01-26", "description": "Republic Day"},
+					{"holiday_date": year + "-03-04", "description": "Holi"},
+					{"holiday_date": year + "-08-15", "description": "Independence Day"},
+					{"holiday_date": year + "-10-02", "description": "Gandhi Jayanti"},
+					{"holiday_date": year + "-11-08", "description": "Diwali"},
+				],
+			}
+		)
+		holiday_list.flags.ignore_permissions = True
+		holiday_list.insert()
+
+	# db_set clears the cached Company document; a raw set_value leaves payroll reading the
+	# old value and failing with "No Holiday List was found"
+	if frappe.db.get_value("Company", company, "default_holiday_list") != name:
+		company_doc = frappe.get_doc("Company", company)
+		company_doc.flags.ignore_permissions = True
+		company_doc.db_set("default_holiday_list", name)
+
+	# HRMS 16 resolves holidays through submitted Holiday List Assignments, not through
+	# Employee.holiday_list or Company.default_holiday_list
+	if not frappe.db.exists(
+		"Holiday List Assignment",
+		{"applicable_for": "Company", "assigned_to": company, "docstatus": 1},
+	):
+		assignment = frappe.get_doc(
+			{
+				"doctype": "Holiday List Assignment",
+				"naming_series": "HR-HLA-.YYYY.-",
+				"applicable_for": "Company",
+				"assigned_to": company,
+				"holiday_list": name,
+				"from_date": year + "-01-01",
+			}
+		)
+		assignment.flags.ignore_permissions = True
+		assignment.insert()
+		assignment.submit()
+
+	for employee in frappe.get_all("Employee", filters={"company": company}, fields=["name", "holiday_list"]):
+		if not employee.holiday_list:
+			frappe.db.set_value("Employee", employee.name, "holiday_list", name, update_modified=False)
+	return name
+
+
+def seed_payroll(company=COMPANY):
+	"""Salary structure, assignments and one month of salary slips.
+
+	India payroll validates a lot, so each step is reported rather than aborting the run: a
+	demo that shows nine employees and one honest error beats one that shows nothing.
+	"""
+	out = {"structure": None, "assignments": 0, "slips": 0, "errors": []}
+	try:
+		ensure_holiday_list(company)
+		ensure_component("Basic", "BASIC", "Earning")
+		ensure_component("House Rent Allowance", "HRA", "Earning")
+		ensure_component("Conveyance Allowance", "CONV", "Earning")
+		ensure_component("Provident Fund", "PF", "Deduction")
+
+		structure_name = frappe.db.get_value(
+			"Salary Structure", {"company": company, "is_active": "Yes"}, "name"
+		)
+		if not structure_name:
+			structure = frappe.get_doc(
+				{
+					"doctype": "Salary Structure",
+					"name": "Coach Works Monthly - UCW",
+					"company": company,
+					"currency": "INR",
+					"payroll_frequency": "Monthly",
+					"is_active": "Yes",
+					"earnings": [
+						{"salary_component": "Basic", "formula": "base * 0.5"},
+						{"salary_component": "House Rent Allowance", "formula": "base * 0.2"},
+						{"salary_component": "Conveyance Allowance", "formula": "base * 0.1"},
+					],
+					"deductions": [],
+				}
+			)
+			structure.flags.ignore_permissions = True
+			structure.insert()
+			structure.submit()
+			structure_name = structure.name
+		out["structure"] = structure_name
+	except Exception as error:
+		out["errors"].append("structure: " + str(error)[:200])
+		return out
+
+	employees = frappe.get_all(
+		"Employee",
+		filters={"company": company, "status": "Active"},
+		fields=["name", "designation"],
+	)
+	for employee in employees:
+		try:
+			if frappe.db.exists("Salary Structure Assignment", {"employee": employee.name, "docstatus": 1}):
+				continue
+			assignment = frappe.get_doc(
+				{
+					"doctype": "Salary Structure Assignment",
+					"employee": employee.name,
+					"salary_structure": structure_name,
+					"company": company,
+					"currency": "INR",
+					"from_date": add_days(nowdate(), -60),
+					"base": SALARIES.get(employee.designation) or 26000,
+				}
+			)
+			assignment.flags.ignore_permissions = True
+			assignment.insert()
+			assignment.submit()
+			out["assignments"] = out["assignments"] + 1
+		except Exception as error:
+			out["errors"].append("assignment " + employee.name + ": " + str(error)[:160])
+
+	start = add_days(nowdate(), -30)
+	end = add_days(nowdate(), -1)
+	for employee in employees:
+		try:
+			if frappe.db.exists(
+				"Salary Slip", {"employee": employee.name, "start_date": start, "docstatus": 1}
+			):
+				continue
+			slip = frappe.get_doc(
+				{
+					"doctype": "Salary Slip",
+					"employee": employee.name,
+					"company": company,
+					"start_date": start,
+					"end_date": end,
+					"posting_date": end,
+					"payroll_frequency": "Monthly",
+					"salary_structure": structure_name,
+				}
+			)
+			slip.flags.ignore_permissions = True
+			slip.insert()
+			slip.submit()
+			out["slips"] = out["slips"] + 1
+		except Exception as error:
+			out["errors"].append("slip " + employee.name + ": " + str(error)[:160])
+	return out
+
+
 def load_demo_data(company=COMPANY, invoice_delivered=True):
 	company = company if frappe.db.exists("Company", company) else frappe.defaults.get_default("company")
 	rates = {}
@@ -200,7 +400,13 @@ def load_demo_data(company=COMPANY, invoice_delivered=True):
 
 	repaired = repair_totals()
 	settled = settle_unpaid_invoices()
-	return {"jobs": made, "totals_repaired": repaired, "invoices_paid": settled}
+	payroll = seed_payroll(company)
+	return {
+		"jobs": made,
+		"totals_repaired": repaired,
+		"invoices_paid": settled,
+		"payroll": payroll,
+	}
 
 
 def make_estimate(job, vehicle, rates):
