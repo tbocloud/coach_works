@@ -5,6 +5,11 @@ import json
 import os
 import re
 
+
+def doctype_name(label):
+	return label.replace(" ", "")
+
+
 SPEC = {
 	"app": "coach_works",
 	"app_title": "Coach Works",
@@ -19,18 +24,18 @@ SPEC = {
 			"icon": "wrench",
 			"items": [
 				("workspace", "Home", "Job Work", "home"),
-				("doctype", "Coach Work Order", "Coach Work Order", "clipboard-list"),
-				("doctype", "Vehicle", "Vehicle", "truck"),
-				("doctype", "Job Work Estimate", "Job Work Estimate", "file-text"),
-				("doctype", "Job Work Charge", "Job Work Charge", "receipt"),
-				("doctype", "Work Stage", "Work Stage", "git-branch"),
+				("doctype", "Coach Work Order", doctype_name("Coach Work Order"), "clipboard-list"),
+				("doctype", "Vehicle", doctype_name("Vehicle"), "truck"),
+				("doctype", "Job Work Estimate", doctype_name("Job Work Estimate"), "file-text"),
+				("doctype", "Job Work Charge", doctype_name("Job Work Charge"), "receipt"),
+				("doctype", "Work Stage", doctype_name("Work Stage"), "git-branch"),
 				(
 					"section",
 					"Setup",
 					"settings",
 					[
-						("doctype", "Vehicle Type", "Vehicle Type"),
-						("doctype", "Coach Work Settings", "Coach Work Settings"),
+						("doctype", "Vehicle Type", doctype_name("Vehicle Type")),
+						("doctype", "Coach Work Settings", doctype_name("Coach Work Settings")),
 					],
 				),
 			],

@@ -1,6 +1,6 @@
 {
  "app": "coach_works",
- "creation": "2026-11-23 12:00:21.156206",
+ "creation": "2026-11-23 12:56:40.115996",
  "docstatus": 0,
  "doctype": "Dock",
  "idx": 0,
@@ -22,7 +22,7 @@
    "title": "Coach Works Reports"
   }
  ],
- "modified": "2026-11-23 12:00:21.156206",
+ "modified": "2026-11-23 12:56:40.115996",
  "modified_by": "Administrator",
  "name": "coach_works",
  "owner": "Administrator",

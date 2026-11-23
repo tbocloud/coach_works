@@ -1,14 +1,14 @@
 import frappe
 
 STAGES = [
-	("Enquiry", "#868e96", "open"),
-	("Estimate", "#4c6ef5", "open"),
-	("Approved", "#12b886", "open"),
-	("Build", "#f59f00", "open"),
-	("Paint / Finishing", "#fd7e14", "open"),
-	("Ready", "#0ca678", "open"),
-	("Delivered", "#495057", "closed"),
-	("Cancelled", "#c92a2a", "cancelled"),
+	("Enquiry", "#868e96", "Open"),
+	("Estimate", "#4c6ef5", "Open"),
+	("Approved", "#12b886", "Open"),
+	("Build", "#f59f00", "Open"),
+	("Paint / Finishing", "#fd7e14", "Open"),
+	("Ready", "#0ca678", "Open"),
+	("Delivered", "#495057", "Closed"),
+	("Cancelled", "#c92a2a", "Cancelled"),
 ]
 
 VEHICLE_TYPES = [
@@ -19,15 +19,6 @@ VEHICLE_TYPES = [
 	"Side Wheel Fixing",
 	"Mini Food Truck",
 ]
-
-DEFAULTS = {
-	"Coach Works Settings": {
-		"company": None,
-		"default_stage": "Enquiry",
-		"enable_estimate_approval": 1,
-	},
-	"Vehicle Type": [{"doctype": "Vehicle Type", "vehicle_type": v} for v in VEHICLE_TYPES],
-}
 
 
 def after_install():
@@ -40,11 +31,15 @@ def after_migrate():
 	_sync_settings()
 
 
+def _exists(doctype, name=None):
+	return frappe.db.exists(doctype, name) if name else frappe.db.exists("DocType", doctype)
+
+
 def _sync_work_stages():
-	if not frappe.db.exists("DocType", "Work Stage"):
+	if not _exists("Work Stage"):
 		return
 	for idx, (stage, color, status) in enumerate(STAGES, start=1):
-		if frappe.db.exists("Work Stage", stage):
+		if _exists("Work Stage", stage):
 			continue
 		frappe.get_doc(
 			{
@@ -58,23 +53,26 @@ def _sync_work_stages():
 
 
 def _sync_vehicle_types():
-	if not frappe.db.exists("DocType", "Vehicle Type"):
+	if not _exists("Vehicle Type"):
 		return
-	for row in DEFAULTS["Vehicle Type"]:
-		if frappe.db.exists("Vehicle Type", row["vehicle_type"]):
+	for vehicle_type in VEHICLE_TYPES:
+		if _exists("Vehicle Type", vehicle_type):
 			continue
-		frappe.get_doc({"doctype": "Vehicle Type", **row}).insert(
+		frappe.get_doc({"doctype": "Vehicle Type", "vehicle_type": vehicle_type}).insert(
 			ignore_permissions=True, ignore_if_duplicate=True
 		)
 
 
 def _sync_settings():
-	if not frappe.db.exists("DocType", "Coach Works Settings"):
+	if not _exists("Coach Work Settings"):
 		return
-	if frappe.db.exists("Coach Works Settings", "Coach Works Settings"):
+	if _exists("Coach Work Settings", "Coach Work Settings"):
 		return
-	values = dict(DEFAULTS["Coach Works Settings"])
-	values["company"] = values["company"] or frappe.defaults.get_defaults().get("company")
-	frappe.get_doc({"doctype": "Coach Works Settings", **values}).insert(
-		ignore_permissions=True, ignore_if_duplicate=True
-	)
+	frappe.get_doc(
+		{
+			"doctype": "Coach Work Settings",
+			"company": frappe.defaults.get_defaults().get("company"),
+			"default_stage": "Enquiry",
+			"enable_estimate_approval": 1,
+		}
+	).insert(ignore_permissions=True, ignore_if_duplicate=True)
