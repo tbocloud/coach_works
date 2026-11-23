@@ -1,0 +1,14 @@
+[
+ {
+  "doctype": "Role",
+  "name": "Job Work Manager",
+  "role_name": "Job Work Manager",
+  "desk_access": 1
+ },
+ {
+  "doctype": "Role",
+  "name": "Job Work User",
+  "role_name": "Job Work User",
+  "desk_access": 1
+ }
+]

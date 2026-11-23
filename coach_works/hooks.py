@@ -26,6 +26,15 @@ add_to_apps_screen = [
 after_install = "coach_works.install.after_install"
 after_migrate = "coach_works.install.after_migrate"
 
+fixtures = [
+	{"dt": "Role", "filters": [["role", "in", ["Job Work Manager", "Job Work User"]]]},
+]
+
+# DocType JS for the job board
+# ----------------------------
+
+doctype_list_js = {"Coach Work Order": "public/js/coach_work_order_list.js"}
+
 # Includes in <head>
 # ------------------
 
