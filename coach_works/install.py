@@ -1,3 +1,5 @@
+import os
+
 import frappe
 
 STAGES = [
@@ -26,9 +28,24 @@ def after_install():
 
 
 def after_migrate():
+	_sync_module_def()
 	_sync_work_stages()
 	_sync_vehicle_types()
 	_sync_settings()
+
+
+def _sync_module_def():
+	"""The module lives on disk once the app is really installed, so it stops being "custom".
+
+	Sites where the DocTypes were created over the API have no `job_work` package, and there the
+	Module Def must stay custom -- otherwise Desk cannot resolve the module path and every report
+	and page under it fails with "Module Job Work not found".
+	"""
+	module_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "job_work")
+	if not os.path.isdir(module_path):
+		return
+	if frappe.db.exists("Module Def", "Job Work"):
+		frappe.db.set_value("Module Def", "Job Work", "custom", 0)
 
 
 def _exists(doctype, name=None):

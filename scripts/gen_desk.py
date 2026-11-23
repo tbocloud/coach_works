@@ -27,6 +27,7 @@ SPEC = {
 			"icon": "wrench",
 			"items": [
 				("workspace", "Home", "Job Work", "home"),
+				("page", "Dashboard", "coach-works-dashboard", "layout-dashboard"),
 				("doctype", "Coach Work Order", doctype_name("Coach Work Order"), "clipboard-list"),
 				("doctype", "Vehicle", doctype_name("Vehicle"), "truck"),
 				("doctype", "Job Work Estimate", doctype_name("Job Work Estimate"), "file-text"),
