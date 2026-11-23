@@ -280,7 +280,7 @@ def api(method, path, payload=None):
 
 def rq(path, **params):
 	q = urllib.parse.urlencode(
-		{k: json.dumps(v) if isinstance(v, (list, dict)) else v for k, v in params.items()}
+		{k: json.dumps(v) if isinstance(v, list | dict) else v for k, v in params.items()}
 	)
 	return api("GET", f"{path}?{q}")
 

@@ -54,7 +54,9 @@ def server_body():
 	"""
 	with open(DEMO_PY) as f:
 		source = f.read()
-	source = re.sub(r"try:\n\timport frappe\nexcept ImportError:.*?\n\tfrappe = frappe\n", "", source, flags=re.S)
+	source = re.sub(
+		r"try:\n\timport frappe\nexcept ImportError:.*?\n\tfrappe = frappe\n", "", source, flags=re.S
+	)
 	if "\timport frappe" in source:
 		sys.exit("demo.py still imports frappe; the Server Script sandbox refuses imports")
 	return (
