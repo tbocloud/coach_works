@@ -112,6 +112,30 @@ def strip_controller_fields(doc):
 	return doc
 
 
+def deploy_module():
+	"""Module Def for the module the DocTypes belong to.
+
+	Deployed this way the module exists only in the database -- the app's `job_work` package is
+	not on this server's disk. Marking the module `custom` tells Frappe exactly that, so Desk
+	stops trying to resolve `get_module_path("Job Work")` and stops failing with
+	"Module Job Work not found" when a Query Report is opened.
+	"""
+	print("Module Def:")
+	upsert(
+		"Module Def",
+		{
+			"doctype": "Module Def",
+			"name": "Job Work",
+			"module_name": "Job Work",
+			"app_name": "coach_works",
+			"custom": 1,
+		},
+	)
+	print("Roles:")
+	for role in ("Job Work Manager", "Job Work User"):
+		upsert("Role", {"doctype": "Role", "name": role, "role_name": role})
+
+
 def deploy_doctypes():
 	print("DocTypes:")
 	pending = [strip_controller_fields(load(p)) for p in DOCTYPE_FILES]
@@ -176,6 +200,7 @@ def deploy_desk():
 
 
 STEPS = {
+	"module": deploy_module,
 	"doctypes": deploy_doctypes,
 	"dashboard": deploy_dashboard,
 	"reports": deploy_reports,
@@ -204,7 +229,7 @@ def main():
 	if code != 200:
 		sys.exit(f"auth failed: {me}")
 
-	for name in args.only or ["doctypes", "dashboard", "reports", "workspace", "desk"]:
+	for name in args.only or ["module", "doctypes", "dashboard", "reports", "workspace", "desk"]:
 		STEPS[name]()
 
 
