@@ -10,22 +10,28 @@
   "customer",
   "customer_name",
   "vehicle",
-  "column_break_1",
+  "vehicle_type",
+  "column_break_job",
   "posting_date",
+  "expected_delivery_date",
   "stage",
   "status",
-  "section_break_1",
+  "work_section",
   "work_description",
-  "estimate",
-  "column_break_2",
-  "expected_delivery_date",
+  "column_break_work",
   "assigned_to",
-  "section_break_2",
+  "supervisor_name",
+  "charges_section",
   "charges",
-  "section_break_3",
+  "column_break_total",
+  "column_break_total_left",
+  "column_break_total_right",
   "total_amount",
+  "billing_section",
+  "quotation",
+  "column_break_billing",
   "sales_invoice",
-  "section_break_4",
+  "history_section",
   "stage_log"
  ],
  "fields": [
@@ -33,22 +39,30 @@
    "default": "JOB-.YYYY.-.#####",
    "fieldname": "naming_series",
    "fieldtype": "Select",
-   "hidden": 0,
+   "hidden": 1,
    "label": "Series",
-   "options": "JOB-.YYYY.-.#####"
+   "no_copy": 1,
+   "options": "JOB-.YYYY.-.#####",
+   "print_hide": 1,
+   "reqd": 1,
+   "set_only_once": 1
   },
   {
    "fieldname": "customer",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Customer",
    "options": "Customer",
-   "reqd": 1
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "fetch_from": "customer.customer_name",
    "fieldname": "customer_name",
    "fieldtype": "Data",
+   "hidden": 1,
+   "in_global_search": 1,
    "label": "Customer Name",
    "read_only": 1
   },
@@ -56,74 +70,89 @@
    "fieldname": "vehicle",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Vehicle",
    "options": "Coach Work Vehicle",
-   "reqd": 1
+   "reqd": 1,
+   "search_index": 1
   },
   {
-   "fieldname": "column_break_1",
-   "fieldtype": "Column Break",
-   "label": "Column Break 1"
+   "fetch_from": "vehicle.vehicle_type",
+   "fieldname": "vehicle_type",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Vehicle Type",
+   "options": "Vehicle Type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_job",
+   "fieldtype": "Column Break"
   },
   {
    "default": "Today",
    "fieldname": "posting_date",
    "fieldtype": "Date",
-   "in_list_view": 1,
-   "label": "Job Date"
+   "label": "Job Date",
+   "reqd": 1
   },
   {
+   "fieldname": "expected_delivery_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Promised Delivery"
+  },
+  {
+   "description": "Use the Move buttons at the top of the form to change the stage.",
    "fieldname": "stage",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Stage",
    "options": "Work Stage",
-   "reqd": 1
+   "read_only": 1,
+   "search_index": 1
   },
   {
    "default": "Open",
    "fieldname": "status",
    "fieldtype": "Select",
-   "in_list_view": 1,
+   "hidden": 1,
    "label": "Status",
    "options": "Open\nClosed\nCancelled",
-   "read_only": 1
+   "read_only": 1,
+   "search_index": 1
   },
   {
-   "fieldname": "section_break_1",
+   "fieldname": "work_section",
    "fieldtype": "Section Break",
-   "label": "Job Details"
+   "label": "Work"
   },
   {
    "fieldname": "work_description",
    "fieldtype": "Small Text",
-   "label": "Work Description",
-   "reqd": 1
+   "label": "Work To Be Done"
   },
   {
-   "fieldname": "estimate",
-   "fieldtype": "Link",
-   "label": "Estimate",
-   "options": "Job Work Estimate"
-  },
-  {
-   "fieldname": "column_break_2",
-   "fieldtype": "Column Break",
-   "label": "Column Break 2"
-  },
-  {
-   "fieldname": "expected_delivery_date",
-   "fieldtype": "Date",
-   "label": "Expected Delivery Date"
+   "fieldname": "column_break_work",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "assigned_to",
    "fieldtype": "Link",
-   "label": "Assigned To",
+   "label": "Supervisor",
    "options": "Employee"
   },
   {
-   "fieldname": "section_break_2",
+   "fetch_from": "assigned_to.employee_name",
+   "fieldname": "supervisor_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Supervisor Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "charges_section",
    "fieldtype": "Section Break",
    "label": "Charges"
   },
@@ -134,15 +163,39 @@
    "options": "Job Work Charge"
   },
   {
-   "fieldname": "section_break_3",
-   "fieldtype": "Section Break",
-   "label": "Section Break 3"
+   "fieldname": "column_break_total",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_total_left",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_total_right",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "total_amount",
    "fieldtype": "Currency",
-   "label": "Total Amount",
+   "label": "Total (before tax)",
    "read_only": 1
+  },
+  {
+   "fieldname": "billing_section",
+   "fieldtype": "Section Break",
+   "label": "Quotation & Billing"
+  },
+  {
+   "fieldname": "quotation",
+   "fieldtype": "Link",
+   "label": "Accepted Quotation",
+   "no_copy": 1,
+   "options": "Quotation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_billing",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "sales_invoice",
@@ -153,31 +206,41 @@
    "read_only": 1
   },
   {
-   "fieldname": "section_break_4",
+   "collapsible": 1,
+   "fieldname": "history_section",
    "fieldtype": "Section Break",
    "label": "Stage History"
   },
   {
    "fieldname": "stage_log",
    "fieldtype": "Table",
-   "label": "Stage Log",
+   "label": "Stage History",
    "no_copy": 1,
    "options": "Job Work Stage Log",
    "read_only": 1
   }
  ],
- "is_submittable": 1,
+ "is_submittable": 0,
  "istable": 0,
- "links": [],
- "modified": "2026-11-23 13:38:00.000000",
+ "links": [
+  {
+   "group": "Sales",
+   "link_doctype": "Quotation",
+   "link_fieldname": "coach_work_order"
+  },
+  {
+   "group": "Sales",
+   "link_doctype": "Sales Invoice",
+   "link_fieldname": "coach_work_order"
+  }
+ ],
+ "modified": "2026-11-24 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Job Work",
  "name": "Coach Work Order",
  "owner": "Administrator",
  "permissions": [
   {
-   "amend": 1,
-   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -187,12 +250,9 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
-   "submit": 1,
    "write": 1
   },
   {
-   "amend": 1,
-   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -202,7 +262,6 @@
    "report": 1,
    "role": "Job Work Manager",
    "share": 1,
-   "submit": 1,
    "write": 1
   },
   {
@@ -214,12 +273,12 @@
    "report": 1,
    "role": "Job Work User",
    "share": 1,
-   "submit": 1,
    "write": 1
   }
  ],
- "search_fields": "customer,vehicle,status,stage",
- "sort_field": "modified",
+ "search_fields": "customer_name,vehicle,stage",
+ "show_title_field_in_link": 0,
+ "sort_field": "posting_date",
  "sort_order": "DESC",
  "states": [],
  "title_field": "customer_name",

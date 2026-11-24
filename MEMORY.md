@@ -1,47 +1,39 @@
 # coach_works
 
-Frappe 16 app for Unicorn Coach Works (India): job-work flow from Enquiry to Delivered, with accounting left to ERPNext Sales Invoice.
+Frappe 16 app for Unicorn Coach Works (India): one job per vehicle visit, from enquiry to delivery. Quotes, invoices and payments are ERPNext documents linked back to the job.
 
 ## Stack
-- Frappe 16.5x+ (demo site runs 16.60.2, ERPNext 16.60.0, hrms 16.60.0, india_compliance)
-- Local bench `/Users/sammishthundiyil/frappe-bench-tbo` is Frappe **15** — no `Sidebar`/`Dock` DocTypes, so desk files can only be verified by migrate on a v16 site
-- Demo site `https://coachworks-demo.tbocloud.in`, user `demo@tbocloud.in`, company `Unicorn Coach Works` (abbr `UCW`), INR
-- No SSH to the demo host; everything is deployed over the REST API
-
-## Desk layout (Frappe 16.5x paths)
-- Dock: `coach_works/dock/coach_works/coach_works.json` (`name` = app, `standard: 1`, `user: ""`)
-- Sidebars: `coach_works/<scrub(module)>/sidebar/<scrub(title)>/<scrub(title)>.json` — `name` = `title`
-- Tile: `coach_works/desktop_icon/coach_works.json`
-- Sidebar titles: exact own module name, or a name matching no module on the site; slug must be unique
-- Regenerate with `python3 scripts/gen_desk.py` (its `SPEC` is the source of truth)
-- `Workspace.type` is mandatory — an empty `type` leaves the page with a blank body
-- Dashboard Charts: `chart_type` is the aggregation (`Sum`/`Group By`), `type` is the visual (`Line`/`Bar`/`Donut`)
+- Frappe / ERPNext 16, with hrms and india_compliance on the demo site
+- The local bench `/Users/sammishthundiyil/frappe-bench-tbo` runs Frappe **15**, which has no `Sidebar` or `Dock`. Use `~/frappe-bench-16` to read v16 source.
+- Demo site `https://coachworks-demo.tbocloud.in`: company `Unicorn Coach Works` (abbr `UCW`), INR
 
 ## Deploy
-- `scripts/deploy_remote.py --only module|doctypes|dashboard|reports|workspace|desk`
-- `Module Def` "Job Work" must be `custom: 1`: the DocTypes are deployed over REST, so the module has no package on the server disk and desk raises `Module Job Work not found` otherwise
-- `scripts/seed_demo_server_script.py` pushes `coach_works/demo.py` as a Server Script and runs it
+- The app is installed on the demo site from `tbocloud/coach_works`, branch `main`.
+- To deploy: push to `main`, then click **Update** on the site in the TBO Cloud dashboard. That runs migrate.
+- There is no REST deployment anymore. The old `deploy_remote.py` and seed scripts are gone.
 
-## Server Script sandbox limits
-- No `import`, no `__import__`, no underscore-prefixed names (`_make_order` → `SyntaxError`), no private attributes (`frappe.__version__`)
-- No controller methods on deployed DocTypes — `set_totals`, `append_stage_log` etc. do not exist there; compute inline
-- A Server Script runs in a transaction: call `frappe.db.commit()` or the writes roll back silently
-- Use `frappe.utils.*` namespaced calls; the `frappe` module surface is partial (`get_module_path`, `has_permission`, `clear_cache`, `client.*` may be absent)
+## Desk layout (Frappe 16.5x)
+- One sidebar, `Coach Works` (module `Job Work`), with Dashboard first. Regenerate it with `python3 scripts/gen_desk.py`; its `SPEC` is the source of truth for the sidebar, dock and desktop tile.
+- A sidebar title may not be another module's name. That is why the empty `Coach Works` module was removed.
+- Migrate reaps orphaned standard Workspaces, Sidebars, Dashboards, Pages and Reports, and orphaned DocTypes. It does not reap Dashboard Charts or Number Cards.
+- An app's sidebar JSON is imported with `ignore_validate`, so title rules are not enforced at import.
 
-## Frappe 16 / API gotchas
-- `frappe.client.submit` cannot submit over REST; set `doc.docstatus = 1; doc.save()` server-side instead
-- Standard records (Report `is_standard`, Sidebar, Dock) cannot be written over the API unless the site is in developer mode — deploy as site-owned for Reports
-- A submitted document cannot be saved again; child-table display values must go through `frappe.db.set_value`
-- `db.set_value` leaves stale cached docs — use `doc.db_set` where payroll validation reads the value back
-- Naming-series counters are not rolled back by a failed transaction; a duplicate `insert()` in the same flow causes `DuplicateEntryError`
+## Domain model
+- **Coach Work Order** (shown as "Jobs") is **not submittable**.
+  - The stage changes only through `move_to_stage`, and every move is appended to `stage_log`.
+  - `status` follows `Work Stage.job_status`.
+  - A stage with `requires_quotation` (Build by default) needs `job.quotation` to be set first.
+- Quotes are ERPNext **Quotations**, linked by the custom field `coach_work_order`.
+  - Submitting one moves an Enquiry job to Quoted.
+  - **Accept for Job** (`accept_quotation`) copies the quote's items into the job's charges and moves the job to Approved.
+- **Sales Invoice** is mapped straight from the job (`make_sales_invoice`), with no Sales Order. Submitting it sets `job.sales_invoice`, and cancelling clears it. Charges lock once the job is billed.
+- **Coach Work Vehicle**: the title is `vehicle_name` (registration, else chassis). Registration and chassis numbers are upper-cased and kept unique in `validate`.
+- Roles: `Job Work Manager` (everything), `Job Work User` (create and edit jobs and vehicles, read setup).
 
-## Domain rules
-- DocTypes use spaced names: `Coach Work Order`, `Coach Work Vehicle` (NOT `Vehicle` — ERPNext owns that), `Job Work Estimate`, `Job Work Charge`, `Work Stage`, `Vehicle Type`, `Coach Work Settings`, `Job Work Stage Log`
-- `Sales Invoice.coach_work_order` is a fixture Custom Field linking the invoice back to its job (Connections tab)
-- HRMS 16 resolves holidays through a submitted `Holiday List Assignment`; `Employee.holiday_list` and `Company.default_holiday_list` are no longer read
-- `india_compliance` enforces GSTIN check digits and a mandatory HSN/SAC on Items
-- Never hand-write GL/Stock Ledger entries; post through Sales Invoice / Payment Entry
+## Gotchas
+- `india_compliance` enforces GSTIN check digits and a mandatory HSN/SAC on Items.
+- Never hand-write GL or Stock Ledger entries. Post through Sales Invoice or Payment Entry.
+- HRMS 16 resolves holidays through a submitted `Holiday List Assignment`.
 
 ## Demo data
-- 8 real Indian customers, 10 items (HSN `995729`/`998714`/`995461`/`995462`), 8 vehicles, 8 jobs across all stages, 8 estimates, 1 paid invoice, 10 employees with assignments and 10 submitted salary slips
-- Seeder is re-runnable: existing jobs and invoices are skipped
+`coach_works.demo.load_demo_data` (System Manager only) creates jobs for the demo vehicles that have none, and quotations for jobs past Enquiry. It is safe to re-run.

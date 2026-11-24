@@ -3,22 +3,24 @@
  "autoname": "naming_series:",
  "creation": "2026-11-23 13:20:00.000000",
  "doctype": "DocType",
- "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "naming_series",
   "registration_no",
+  "chassis_no",
   "vehicle_type",
-  "make_model",
   "column_break_1",
   "customer",
-  "owner_name",
-  "chassis_no",
+  "customer_name",
+  "make_model",
+  "vehicle_name",
+  "details_section",
   "engine_no",
-  "section_break_1",
   "registration_year",
+  "column_break_2",
   "fuel_type",
   "disabled",
+  "notes_section",
   "notes"
  ],
  "fields": [
@@ -26,52 +28,75 @@
    "default": "VEH-.YYYY.-.#####",
    "fieldname": "naming_series",
    "fieldtype": "Select",
-   "hidden": 0,
+   "hidden": 1,
    "label": "Series",
-   "options": "VEH-.YYYY.-.#####"
+   "no_copy": 1,
+   "options": "VEH-.YYYY.-.#####",
+   "reqd": 1,
+   "set_only_once": 1
   },
   {
+   "description": "Leave empty for a new build that is not registered yet.",
    "fieldname": "registration_no",
    "fieldtype": "Data",
+   "in_global_search": 1,
    "in_list_view": 1,
-   "label": "Registration No",
-   "reqd": 1,
-   "unique": 1
+   "in_standard_filter": 1,
+   "label": "Registration No"
+  },
+  {
+   "fieldname": "chassis_no",
+   "fieldtype": "Data",
+   "in_global_search": 1,
+   "label": "Chassis No"
   },
   {
    "fieldname": "vehicle_type",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Vehicle Type",
    "options": "Vehicle Type"
   },
   {
-   "fieldname": "make_model",
-   "fieldtype": "Data",
-   "label": "Make / Model"
-  },
-  {
    "fieldname": "column_break_1",
-   "fieldtype": "Column Break",
-   "label": "Column Break 1"
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "customer",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Customer",
    "options": "Customer"
   },
   {
    "fetch_from": "customer.customer_name",
-   "fieldname": "owner_name",
+   "fieldname": "customer_name",
    "fieldtype": "Data",
-   "label": "Owner Name"
+   "hidden": 1,
+   "label": "Customer Name",
+   "read_only": 1
   },
   {
-   "fieldname": "chassis_no",
+   "fieldname": "make_model",
    "fieldtype": "Data",
-   "label": "Chassis No"
+   "in_list_view": 1,
+   "label": "Make / Model"
+  },
+  {
+   "fieldname": "vehicle_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "in_global_search": 1,
+   "label": "Vehicle",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "More Details"
   },
   {
    "fieldname": "engine_no",
@@ -79,25 +104,29 @@
    "label": "Engine No"
   },
   {
-   "fieldname": "section_break_1",
-   "fieldtype": "Section Break",
-   "label": "Other Details"
-  },
-  {
    "fieldname": "registration_year",
    "fieldtype": "Int",
-   "label": "Registration Year"
+   "label": "Year"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "fuel_type",
    "fieldtype": "Select",
    "label": "Fuel Type",
-   "options": "\nPetrol\nDiesel\nCNG\nElectric"
+   "options": "\nDiesel\nPetrol\nCNG\nElectric"
   },
   {
+   "default": "0",
    "fieldname": "disabled",
    "fieldtype": "Check",
    "label": "Disabled"
+  },
+  {
+   "fieldname": "notes_section",
+   "fieldtype": "Section Break"
   },
   {
    "fieldname": "notes",
@@ -105,10 +134,14 @@
    "label": "Notes"
   }
  ],
- "is_submittable": 0,
- "istable": 0,
- "links": [],
- "modified": "2026-11-23 13:20:00.000000",
+ "links": [
+  {
+   "group": "Jobs",
+   "link_doctype": "Coach Work Order",
+   "link_fieldname": "vehicle"
+  }
+ ],
+ "modified": "2026-11-24 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Job Work",
  "name": "Coach Work Vehicle",
@@ -140,7 +173,6 @@
   },
   {
    "create": 1,
-   "delete": 0,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -151,10 +183,12 @@
    "write": 1
   }
  ],
- "search_fields": "registration_no,owner_name,customer",
+ "quick_entry": 0,
+ "search_fields": "registration_no,chassis_no,customer_name,make_model",
+ "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "registration_no",
+ "title_field": "vehicle_name",
  "track_changes": 1
 }
