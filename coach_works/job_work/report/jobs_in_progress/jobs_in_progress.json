@@ -9,15 +9,25 @@
  "idx": 0,
  "is_standard": "Yes",
  "letterhead": null,
- "modified": "2026-11-23 13:28:00.000000",
+ "modified": "2026-11-24 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Job Work",
  "name": "Jobs In Progress",
  "owner": "Administrator",
  "prepared_report": 0,
- "query": "select\n\tcwo.name as \"Job:Link/Coach Work Order:150\",\n\tcwo.customer_name as \"Customer::180\",\n\tv.registration_no as \"Vehicle:Link/Coach Work Vehicle:130\",\n\tcwo.stage as \"Stage:Link/Work Stage:140\",\n\tcwo.posting_date as \"Job Date:Date:110\",\n\tcwo.expected_delivery_date as \"Expected Delivery:Date:140\",\n\tcwo.total_amount as \"Amount:Currency:120\"\nfrom `tabCoach Work Order` cwo\nleft join `tabCoach Work Vehicle` v on v.name = cwo.vehicle\nwhere cwo.docstatus = 1 and cwo.status = 'Open'\norder by cwo.expected_delivery_date asc",
+ "query": "select\n\tcwo.name as \"Job:Link/Coach Work Order:140\",\n\tcwo.customer_name as \"Customer::180\",\n\tv.vehicle_name as \"Vehicle::130\",\n\tcwo.vehicle_type as \"Vehicle Type:Link/Vehicle Type:130\",\n\tcwo.stage as \"Stage:Link/Work Stage:130\",\n\tcwo.posting_date as \"Job Date:Date:100\",\n\tcwo.expected_delivery_date as \"Promised Delivery:Date:130\",\n\tgreatest(datediff(curdate(), cwo.expected_delivery_date), 0) as \"Days Late:Int:90\",\n\tcwo.total_amount as \"Amount:Currency:120\"\nfrom `tabCoach Work Order` cwo\nleft join `tabCoach Work Vehicle` v on v.name = cwo.vehicle\nleft join `tabWork Stage` ws on ws.name = cwo.stage\nwhere cwo.status = 'Open'\norder by ws.sequence asc, cwo.expected_delivery_date asc",
  "ref_doctype": "Coach Work Order",
  "report_name": "Jobs In Progress",
  "report_type": "Query Report",
- "roles": []
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Job Work Manager"
+  },
+  {
+   "role": "Job Work User"
+  }
+ ]
 }

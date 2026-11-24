@@ -1,20 +1,16 @@
 {
  "actions": [],
- "autoname": "Coach Work Settings",
  "creation": "2026-11-23 13:20:00.000000",
  "doctype": "DocType",
- "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "company",
-  "default_stage",
-  "default_warehouse",
   "column_break_1",
-  "enable_estimate_approval",
-  "default_income_account"
+  "default_stage"
  ],
  "fields": [
   {
+   "description": "Used for quotations and invoices made from a job.",
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
@@ -22,40 +18,19 @@
    "reqd": 1
   },
   {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
    "fieldname": "default_stage",
    "fieldtype": "Link",
-   "label": "Default Stage",
+   "label": "Stage For New Jobs",
    "options": "Work Stage"
-  },
-  {
-   "fieldname": "default_warehouse",
-   "fieldtype": "Link",
-   "label": "Default Warehouse",
-   "options": "Warehouse"
-  },
-  {
-   "fieldname": "column_break_1",
-   "fieldtype": "Column Break",
-   "label": "Column Break 1"
-  },
-  {
-   "default": 1,
-   "fieldname": "enable_estimate_approval",
-   "fieldtype": "Check",
-   "label": "Require Estimate Approval Before Build"
-  },
-  {
-   "fieldname": "default_income_account",
-   "fieldtype": "Link",
-   "label": "Default Income Account",
-   "options": "Account"
   }
  ],
- "is_submittable": 0,
  "issingle": 1,
- "istable": 0,
  "links": [],
- "modified": "2026-11-23 13:20:00.000000",
+ "modified": "2026-11-24 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Job Work",
  "name": "Coach Work Settings",
@@ -63,24 +38,18 @@
  "permissions": [
   {
    "create": 1,
-   "delete": 1,
    "email": 1,
-   "export": 1,
    "print": 1,
    "read": 1,
-   "report": 1,
    "role": "System Manager",
    "share": 1,
    "write": 1
   },
   {
-   "create": 0,
-   "delete": 0,
+   "create": 1,
    "email": 1,
-   "export": 1,
    "print": 1,
    "read": 1,
-   "report": 1,
    "role": "Job Work Manager",
    "share": 1,
    "write": 1
@@ -88,6 +57,5 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
- "track_changes": 1
+ "states": []
 }

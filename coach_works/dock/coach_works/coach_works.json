@@ -1,6 +1,6 @@
 {
  "app": "coach_works",
- "creation": "2026-11-23 20:47:52.293251",
+ "creation": "2026-11-24 07:57:14.509229",
  "docstatus": 0,
  "doctype": "Dock",
  "idx": 0,
@@ -8,21 +8,13 @@
   {
    "added": 0,
    "hidden": 0,
-   "icon": "wrench",
-   "link_to": "Job Work",
+   "icon": "truck",
+   "link_to": "Coach Works",
    "link_type": "Sidebar",
-   "title": "Job Work"
-  },
-  {
-   "added": 0,
-   "hidden": 0,
-   "icon": "chart-column",
-   "link_to": "Coach Works Reports",
-   "link_type": "Sidebar",
-   "title": "Coach Works Reports"
+   "title": "Coach Works"
   }
  ],
- "modified": "2026-11-23 20:47:52.293251",
+ "modified": "2026-11-24 07:57:14.509229",
  "modified_by": "Administrator",
  "name": "coach_works",
  "owner": "Administrator",

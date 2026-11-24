@@ -18,51 +18,43 @@ SPEC = {
 	"app_title": "Coach Works",
 	"logo": "/assets/coach_works/logo.svg",
 	"tiles": [
-		{"label": "Coach Works", "link": "auto"},
+		{"label": "Coach Works", "link": "/desk/coach-works-dashboard"},
 	],
+	# One sidebar for the whole app. Its title cannot be another module's name, which is why the
+	# empty `Coach Works` module was removed (patch v1_0.remove_empty_coach_works_module).
 	"rail": [
 		{
-			"title": "Job Work",
+			"title": "Coach Works",
 			"module": "Job Work",
-			"icon": "wrench",
+			"icon": "truck",
 			"items": [
-				("workspace", "Home", "Job Work", "home"),
 				("page", "Dashboard", "coach-works-dashboard", "layout-dashboard"),
-				("doctype", "Coach Work Order", doctype_name("Coach Work Order"), "clipboard-list"),
-				("doctype", "Vehicle", doctype_name("Vehicle"), "truck"),
-				("doctype", "Job Work Estimate", doctype_name("Job Work Estimate"), "file-text"),
-				("doctype", "Job Work Charge", doctype_name("Job Work Charge"), "receipt"),
-				("doctype", "Work Stage", doctype_name("Work Stage"), "git-branch"),
+				("doctype", "Jobs", "Coach Work Order", "clipboard-list"),
+				("doctype", "Quotations", "Quotation", "file-text"),
+				("doctype", "Vehicles", doctype_name("Vehicle"), "truck"),
+				("doctype", "Customers", "Customer", "users"),
+				("doctype", "Invoices", "Sales Invoice", "receipt"),
+				("doctype", "Payments", "Payment Entry", "wallet"),
+				(
+					"section",
+					"Reports",
+					"chart-column",
+					[
+						("report", "Jobs In Progress", "Jobs In Progress"),
+						("report", "Ready for Delivery", "Jobs Ready for Delivery"),
+						("report", "Vehicle History", "Vehicle Job History"),
+					],
+				),
 				(
 					"section",
 					"Setup",
 					"settings",
 					[
-						("doctype", "Vehicle Type", doctype_name("Vehicle Type")),
-						("doctype", "Coach Work Settings", doctype_name("Coach Work Settings")),
+						("doctype", "Work Stages", "Work Stage"),
+						("doctype", "Vehicle Types", "Vehicle Type"),
+						("doctype", "Items & Services", "Item"),
+						("doctype", "Settings", "Coach Work Settings"),
 					],
-				),
-			],
-		},
-		{
-			"title": "Coach Works Reports",
-			"module": "Job Work",
-			"icon": "chart-column",
-			"items": [
-				("workspace", "Overview", "Job Work", "layout-dashboard"),
-				("dashboard", "Dashboard", "Coach Works", "chart-pie"),
-				("report", "Jobs In Progress", "Jobs In Progress", "loader-circle"),
-				(
-					"report",
-					"Jobs Ready for Delivery",
-					"Jobs Ready for Delivery",
-					"circle-check",
-				),
-				(
-					"report",
-					"Vehicle Job History",
-					"Vehicle Job History",
-					"history",
 				),
 			],
 		},
@@ -197,7 +189,7 @@ dock.update(
 )
 dump(f"{ROOT}/dock/{SPEC['app']}/{SPEC['app']}.json", dock)
 
-first_url = "/desk/" + slug(SPEC["rail"][0]["title"])
+first_url = SPEC["tiles"][0]["link"]
 for n, t in enumerate(SPEC["tiles"]):
 	tile = meta("Desktop Icon", t["label"])
 	tile.update(

@@ -1,15 +1,17 @@
 {
  "actions": [],
+ "allow_rename": 1,
  "autoname": "field:stage_name",
  "creation": "2026-11-23 13:20:00.000000",
  "doctype": "DocType",
- "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "stage_name",
   "sequence",
   "job_status",
+  "column_break_1",
   "color",
+  "requires_quotation",
   "description"
  ],
  "fields": [
@@ -22,13 +24,15 @@
    "unique": 1
   },
   {
+   "description": "Stages run from the lowest number up.",
    "fieldname": "sequence",
    "fieldtype": "Int",
    "in_list_view": 1,
-   "label": "Sequence"
+   "label": "Order"
   },
   {
    "default": "Open",
+   "description": "Closed: the job is finished. Cancelled: the job was dropped.",
    "fieldname": "job_status",
    "fieldtype": "Select",
    "in_list_view": 1,
@@ -36,9 +40,19 @@
    "options": "Open\nClosed\nCancelled"
   },
   {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
    "fieldname": "color",
    "fieldtype": "Color",
    "label": "Colour"
+  },
+  {
+   "description": "A job cannot move into this stage until a quotation is accepted for it.",
+   "fieldname": "requires_quotation",
+   "fieldtype": "Check",
+   "label": "Needs an Accepted Quotation"
   },
   {
    "fieldname": "description",
@@ -46,10 +60,8 @@
    "label": "Description"
   }
  ],
- "is_submittable": 0,
- "istable": 0,
  "links": [],
- "modified": "2026-11-23 13:20:00.000000",
+ "modified": "2026-11-24 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Job Work",
  "name": "Work Stage",
@@ -80,21 +92,16 @@
    "write": 1
   },
   {
-   "create": 1,
-   "delete": 0,
    "email": 1,
    "export": 1,
    "print": 1,
    "read": 1,
    "report": 1,
    "role": "Job Work User",
-   "share": 1,
-   "write": 1
+   "share": 1
   }
  ],
- "search_fields": "stage_name",
- "sort_field": "modified",
- "sort_order": "DESC",
- "states": [],
- "track_changes": 1
+ "sort_field": "sequence",
+ "sort_order": "ASC",
+ "states": []
 }

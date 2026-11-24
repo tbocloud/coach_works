@@ -4,16 +4,26 @@
  "doctype": "Page",
  "icon": "layout-dashboard",
  "idx": 0,
- "modified": "2026-11-23 20:50:00.000000",
+ "modified": "2026-11-24 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Job Work",
  "name": "coach-works-dashboard",
  "owner": "Administrator",
  "page_name": "coach-works-dashboard",
- "roles": [],
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Job Work Manager"
+  },
+  {
+   "role": "Job Work User"
+  }
+ ],
  "shared_page": 0,
  "standard": "Yes",
  "system_page": 0,
- "title": "Coach Works Dashboard",
+ "title": "Dashboard",
  "type": ""
 }

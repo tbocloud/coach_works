@@ -9,15 +9,25 @@
  "idx": 0,
  "is_standard": "Yes",
  "letterhead": null,
- "modified": "2026-11-23 13:28:00.000000",
+ "modified": "2026-11-24 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Job Work",
  "name": "Jobs Ready for Delivery",
  "owner": "Administrator",
  "prepared_report": 0,
- "query": "select\n\tcwo.name as \"Job:Link/Coach Work Order:150\",\n\tcwo.customer_name as \"Customer::180\",\n\tv.registration_no as \"Vehicle:Link/Coach Work Vehicle:130\",\n\tcwo.stage as \"Stage:Link/Work Stage:140\",\n\tcwo.expected_delivery_date as \"Expected Delivery:Date:140\",\n\tcwo.total_amount as \"Amount:Currency:120\",\n\tcwo.sales_invoice as \"Sales Invoice:Link/Sales Invoice:150\"\nfrom `tabCoach Work Order` cwo\nleft join `tabCoach Work Vehicle` v on v.name = cwo.vehicle\nwhere cwo.docstatus = 1 and cwo.status = 'Open'\n\tand cwo.stage = 'Ready'\norder by cwo.expected_delivery_date asc",
+ "query": "select\n\tcwo.name as \"Job:Link/Coach Work Order:140\",\n\tcwo.customer_name as \"Customer::180\",\n\tv.vehicle_name as \"Vehicle::130\",\n\tcwo.expected_delivery_date as \"Promised Delivery:Date:130\",\n\tcwo.total_amount as \"Amount:Currency:120\",\n\tcwo.sales_invoice as \"Sales Invoice:Link/Sales Invoice:150\",\n\tsi.outstanding_amount as \"To Collect:Currency:120\"\nfrom `tabCoach Work Order` cwo\nleft join `tabCoach Work Vehicle` v on v.name = cwo.vehicle\nleft join `tabSales Invoice` si on si.name = cwo.sales_invoice and si.docstatus = 1\nwhere cwo.status = 'Open' and cwo.stage = 'Ready'\norder by cwo.expected_delivery_date asc",
  "ref_doctype": "Coach Work Order",
  "report_name": "Jobs Ready for Delivery",
  "report_type": "Query Report",
- "roles": []
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Job Work Manager"
+  },
+  {
+   "role": "Job Work User"
+  }
+ ]
 }

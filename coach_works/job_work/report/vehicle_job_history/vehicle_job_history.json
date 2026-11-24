@@ -9,15 +9,25 @@
  "idx": 0,
  "is_standard": "Yes",
  "letterhead": null,
- "modified": "2026-11-23 13:28:00.000000",
+ "modified": "2026-11-24 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Job Work",
  "name": "Vehicle Job History",
  "owner": "Administrator",
  "prepared_report": 0,
- "query": "select\n\tv.registration_no as \"Vehicle:Link/Coach Work Vehicle:130\",\n\tv.make_model as \"Make / Model::160\",\n\tcwo.name as \"Job:Link/Coach Work Order:150\",\n\tcwo.customer_name as \"Customer::180\",\n\tcwo.stage as \"Stage:Link/Work Stage:140\",\n\tcwo.posting_date as \"Job Date:Date:110\",\n\tcwo.total_amount as \"Amount:Currency:120\"\nfrom `tabCoach Work Vehicle` v\nleft join `tabCoach Work Order` cwo on cwo.vehicle = v.name and cwo.docstatus < 2\norder by v.registration_no asc, cwo.posting_date desc",
+ "query": "select\n\tv.vehicle_name as \"Vehicle::130\",\n\tv.make_model as \"Make / Model::160\",\n\tv.customer_name as \"Vehicle Owner::170\",\n\tcwo.name as \"Job:Link/Coach Work Order:140\",\n\tcwo.stage as \"Stage:Link/Work Stage:130\",\n\tcwo.posting_date as \"Job Date:Date:100\",\n\tcwo.work_description as \"Work::260\",\n\tcwo.total_amount as \"Amount:Currency:120\"\nfrom `tabCoach Work Vehicle` v\nleft join `tabCoach Work Order` cwo on cwo.vehicle = v.name\norder by v.vehicle_name asc, cwo.posting_date desc",
  "ref_doctype": "Coach Work Vehicle",
  "report_name": "Vehicle Job History",
  "report_type": "Query Report",
- "roles": []
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Job Work Manager"
+  },
+  {
+   "role": "Job Work User"
+  }
+ ]
 }

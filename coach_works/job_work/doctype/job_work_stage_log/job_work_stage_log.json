@@ -3,7 +3,7 @@
  "autoname": "hash",
  "creation": "2026-11-23 13:20:00.000000",
  "doctype": "DocType",
- "editable_grid": 1,
+ "editable_grid": 0,
  "engine": "InnoDB",
  "field_order": [
   "stage",
@@ -13,39 +13,39 @@
  ],
  "fields": [
   {
+   "columns": 2,
    "fieldname": "stage",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Stage",
-   "options": "Work Stage",
-   "read_only": 1
+   "options": "Work Stage"
   },
   {
+   "columns": 2,
    "fieldname": "moved_on",
    "fieldtype": "Datetime",
    "in_list_view": 1,
-   "label": "Moved On",
-   "read_only": 1
+   "label": "Moved On"
   },
   {
+   "columns": 2,
    "fieldname": "moved_by",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Moved By",
-   "options": "User",
-   "read_only": 1
+   "options": "User"
   },
   {
+   "columns": 4,
    "fieldname": "remarks",
    "fieldtype": "Small Text",
-   "label": "Remarks",
-   "read_only": 1
+   "in_list_view": 1,
+   "label": "Note"
   }
  ],
- "is_submittable": 0,
  "istable": 1,
  "links": [],
- "modified": "2026-11-23 13:20:00.000000",
+ "modified": "2026-11-24 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Job Work",
  "name": "Job Work Stage Log",
@@ -53,6 +53,5 @@
  "permissions": [],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
- "track_changes": 0
+ "states": []
 }

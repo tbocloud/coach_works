@@ -1,234 +1,186 @@
-"""Aggregates for the Coach Works dashboard page.
-
-One round trip returns everything the page draws: the stage mix, the four headline tiles,
-"Needs a look", "This month so far" and the per-vehicle-type table. The page is read-only, so
-this is a plain whitelisted read -- no writes, no GL, no stock.
-"""
+"""Numbers for the Coach Works dashboard page, in one read-only round trip."""
 
 import frappe
-from frappe.utils import flt, getdate, nowdate
+from frappe.utils import add_days, flt, get_first_day, getdate, nowdate
 
-STAGES = [
-	"Enquiry",
-	"Estimate",
-	"Approved",
-	"Build",
-	"Paint / Finishing",
-	"Ready",
-	"Delivered",
-]
-
-STAGE_COLORS = {
-	"Enquiry": "#98a2b3",
-	"Estimate": "#7c3aed",
-	"Approved": "#2490ef",
-	"Build": "#f59e0b",
-	"Paint / Finishing": "#ec4899",
-	"Ready": "#28a745",
-	"Delivered": "#0b7285",
-}
+LIST_LIMIT = 8
 
 
 @frappe.whitelist()
-def get_dashboard_data(from_date=None, to_date=None, stage=None, vehicle_type=None):
-	"""Dashboard payload for the given period, optionally narrowed to one stage / vehicle type."""
-	to_date = getdate(to_date or nowdate())
-	from_date = getdate(from_date or nowdate())
-	if from_date > to_date:
-		from_date, to_date = to_date, from_date
-	month_start = getdate(to_date).replace(day=1)
+def get_dashboard_data():
+	frappe.has_permission("Coach Work Order", "read", throw=True)
+	today = getdate(nowdate())
 
-	jobs = frappe.get_all(
+	stages = frappe.get_all(
+		"Work Stage",
+		fields=["name", "sequence", "job_status"],
+		order_by="sequence asc",
+	)
+	# get_list, not get_all: a user limited to some customers sees only their jobs
+	open_jobs = frappe.get_list(
 		"Coach Work Order",
-		filters={"docstatus": 1},
+		filters={"status": "Open"},
 		fields=[
 			"name",
 			"customer_name",
+			"vehicle",
 			"stage",
-			"status",
-			"posting_date",
 			"expected_delivery_date",
 			"total_amount",
-			"estimate",
-			"sales_invoice",
-			"vehicle",
 		],
 		limit_page_length=0,
-		order_by="posting_date desc",
 	)
-	vehicles = _vehicle_types()
-	for job in jobs:
-		job["vehicle_type"] = vehicles.get(job.vehicle) or "Not set"
+	add_vehicle_names(open_jobs)
 
-	if stage:
-		jobs = [job for job in jobs if job.stage == stage]
-	if vehicle_type:
-		jobs = [job for job in jobs if job["vehicle_type"] == vehicle_type]
-
-	open_jobs = [job for job in jobs if job.status == "Open"]
-
-	return {
-		"as_on": str(to_date),
-		"from_date": str(from_date),
-		"to_date": str(to_date),
-		"stage_colors": STAGE_COLORS,
-		"stages": STAGES,
-		"tiles": _tiles(jobs, open_jobs),
-		"by_stage": _by_stage(open_jobs),
-		"needs_look": _needs_look(open_jobs, to_date),
-		"period": _period(month_start, to_date),
-		"by_vehicle_type": _by_vehicle_type(jobs, open_jobs),
-		"filters": {"stage": stage, "vehicle_type": vehicle_type},
-	}
-
-
-def _vehicle_types():
-	return {
-		row.name: row.vehicle_type or "Not set"
-		for row in frappe.get_all(
-			"Coach Work Vehicle",
-			fields=["name", "vehicle_type"],
-			limit_page_length=0,
-		)
-	}
-
-
-def _tiles(jobs, open_jobs):
-	ready = [job for job in open_jobs if job.stage == "Ready"]
-	delivered = [job for job in jobs if job.stage == "Delivered"]
-	return {
-		"active": len(open_jobs),
-		"ready": len(ready),
-		"delivered": len(delivered),
-		"open_value": flt(sum(flt(job.total_amount) for job in open_jobs), 2),
-		"active_count": len(jobs),
-	}
-
-
-def _by_stage(open_jobs):
-	counts = {stage: [0, 0.0] for stage in STAGES}
+	late, due_soon = [], []
 	for job in open_jobs:
-		bucket = counts.setdefault(job.stage or "Enquiry", [0, 0.0])
-		bucket[0] += 1
-		bucket[1] += flt(job.total_amount)
+		promised = job.expected_delivery_date and getdate(job.expected_delivery_date)
+		if not promised:
+			continue
+		job.days = (promised - today).days
+		if promised < today:
+			late.append(job)
+		elif promised <= add_days(today, 7):
+			due_soon.append(job)
+	late.sort(key=lambda job: job.days)
+	due_soon.sort(key=lambda job: job.days)
 
-	total = sum(bucket[0] for bucket in counts.values()) or 1
-	rows = [
-		{
-			"stage": stage,
-			"count": bucket[0],
-			"amount": flt(bucket[1], 2),
-			"percent": round(bucket[0] * 100.0 / total, 1),
-			"color": STAGE_COLORS.get(stage, "#98a2b3"),
-		}
-		for stage, bucket in counts.items()
-		if bucket[0]
-	]
-	rows.sort(key=lambda row: STAGES.index(row["stage"]) if row["stage"] in STAGES else 99)
-	return rows
-
-
-def _needs_look(open_jobs, as_on):
-	overdue = [job for job in open_jobs if job.expected_delivery_date and getdate(job.expected_delivery_date) < as_on]
-	overdue.sort(key=lambda job: job.expected_delivery_date)
-	no_estimate = [job for job in open_jobs if not job.estimate]
-
-	unpaid = frappe.get_all(
-		"Sales Invoice",
-		filters={"docstatus": 1, "outstanding_amount": (">", 0)},
-		fields=["name", "customer_name", "outstanding_amount", "due_date"],
-		limit_page_length=0,
-		order_by="due_date asc",
-	)
+	unpaid = unpaid_invoices(today)
 
 	return {
-		"overdue_count": len(overdue),
-		"overdue": [
-			{
-				"name": job.name,
-				"customer_name": job.customer_name,
-				"stage": job.stage,
-				"expected_delivery_date": str(job.expected_delivery_date),
-				"days_late": (as_on - getdate(job.expected_delivery_date)).days,
-			}
-			for job in overdue[:6]
-		],
-		"no_estimate_count": len(no_estimate),
-		"unpaid_count": len(unpaid),
-		"unpaid_amount": flt(sum(flt(row.outstanding_amount) for row in unpaid), 2),
-		"unpaid": [
-			{
-				"name": row.name,
-				"customer_name": row.customer_name,
-				"outstanding_amount": flt(row.outstanding_amount, 2),
-				"due_date": str(row.due_date) if row.due_date else None,
-			}
-			for row in unpaid[:6]
-		],
-	}
-
-
-def _period(from_date, to_date):
-	created = frappe.get_all(
-		"Coach Work Order",
-		filters={"docstatus": 1, "posting_date": ("between", (from_date, to_date))},
-		fields=["name", "total_amount"],
-		limit_page_length=0,
-	)
-	delivered = frappe.get_all(
-		"Coach Work Order",
-		filters={
-			"docstatus": 1,
-			"stage": "Delivered",
-			"posting_date": ("between", (from_date, to_date)),
+		"tiles": {
+			"in_progress": len(open_jobs),
+			"ready": sum(1 for job in open_jobs if job.stage == "Ready"),
+			"late": len(late),
+			"to_collect": flt(sum(row.outstanding_amount for row in unpaid), 2),
+			"open_value": flt(sum(flt(job.total_amount) for job in open_jobs), 2),
 		},
-		pluck="name",
-	)
-	invoices = frappe.get_all(
-		"Sales Invoice",
-		filters={"docstatus": 1, "posting_date": ("between", (from_date, to_date))},
-		fields=["grand_total"],
-		limit_page_length=0,
-	)
-	payments = frappe.get_all(
-		"Payment Entry",
-		filters={"docstatus": 1, "posting_date": ("between", (from_date, to_date))},
-		fields=["paid_amount"],
-		limit_page_length=0,
-	)
-
-	return {
-		"jobs_created": len(created),
-		"jobs_value": flt(sum(flt(row.total_amount) for row in created), 2),
-		"jobs_delivered": len(delivered),
-		"invoiced": flt(sum(flt(row.grand_total) for row in invoices), 2),
-		"collected": flt(sum(flt(row.paid_amount) for row in payments), 2),
+		"stages": stage_board(stages, open_jobs),
+		"late": [job_row(job) for job in late[:LIST_LIMIT]],
+		"late_more": max(len(late) - LIST_LIMIT, 0),
+		"due_soon": [job_row(job) for job in due_soon[:LIST_LIMIT]],
+		"unpaid": [invoice_row(row, today) for row in unpaid[:LIST_LIMIT]],
+		"unpaid_more": max(len(unpaid) - LIST_LIMIT, 0),
+		"month": this_month(today),
 	}
 
 
-def _by_vehicle_type(jobs, open_jobs):
-	buckets = {}
-	for job in jobs:
-		bucket = buckets.setdefault(
-			job["vehicle_type"], {"jobs": 0, "open": 0, "open_value": 0.0, "delivered": 0}
+def add_vehicle_names(jobs):
+	names = {job.vehicle for job in jobs if job.vehicle}
+	if not names:
+		return
+	titles = dict(
+		frappe.get_all(
+			"Coach Work Vehicle",
+			filters={"name": ("in", list(names))},
+			fields=["name", "vehicle_name"],
+			as_list=True,
 		)
-		bucket["jobs"] += 1
-		if job.stage == "Delivered":
-			bucket["delivered"] += 1
-	for job in open_jobs:
-		bucket = buckets[job["vehicle_type"]]
-		bucket["open"] += 1
-		bucket["open_value"] += flt(job.total_amount)
+	)
+	for job in jobs:
+		job.vehicle_name = titles.get(job.vehicle) or job.vehicle
 
-	rows = [
-		{
-			"vehicle_type": vehicle_type,
-			"jobs": bucket["jobs"],
-			"open": bucket["open"],
-			"open_value": flt(bucket["open_value"], 2),
-			"delivered": bucket["delivered"],
-		}
-		for vehicle_type, bucket in buckets.items()
-	]
-	rows.sort(key=lambda row: (-row["jobs"], row["vehicle_type"]))
-	return rows
+
+def stage_board(stages, open_jobs):
+	board = {
+		stage.name: {"stage": stage.name, "count": 0, "value": 0.0}
+		for stage in stages
+		if stage.job_status == "Open"
+	}
+	for job in open_jobs:
+		cell = board.setdefault(job.stage or "", {"stage": job.stage or "", "count": 0, "value": 0.0})
+		cell["count"] += 1
+		cell["value"] += flt(job.total_amount)
+	return [cell for cell in board.values() if cell["stage"]]
+
+
+def job_row(job):
+	return {
+		"name": job.name,
+		"customer_name": job.customer_name,
+		"vehicle": job.vehicle_name,
+		"stage": job.stage,
+		"promised": str(job.expected_delivery_date),
+		"days": job.days,
+	}
+
+
+def unpaid_invoices(today):
+	filters = {"docstatus": 1, "outstanding_amount": (">", 0), "coach_work_order": ("is", "set")}
+	if not frappe.has_permission("Sales Invoice", "read"):
+		return []
+	return frappe.get_list(
+		"Sales Invoice",
+		filters=filters,
+		fields=["name", "customer_name", "outstanding_amount", "due_date", "coach_work_order"],
+		order_by="due_date asc",
+		limit_page_length=0,
+	)
+
+
+def invoice_row(row, today):
+	return {
+		"name": row.name,
+		"customer_name": row.customer_name,
+		"outstanding": flt(row.outstanding_amount, 2),
+		"job": row.coach_work_order,
+		"due_date": str(row.due_date) if row.due_date else None,
+		"days_overdue": (today - getdate(row.due_date)).days if row.due_date else 0,
+	}
+
+
+def this_month(today):
+	start = get_first_day(today)
+	between = ("between", (start, today))
+	received = len(
+		frappe.get_list(
+			"Coach Work Order", filters={"posting_date": between}, pluck="name", limit_page_length=0
+		)
+	)
+	delivered_stages = frappe.get_all("Work Stage", filters={"job_status": "Closed"}, pluck="name")
+	delivered = 0
+	if delivered_stages:
+		delivered = len(
+			set(
+				frappe.get_all(
+					"Job Work Stage Log",
+					filters={
+						"parenttype": "Coach Work Order",
+						"stage": ("in", delivered_stages),
+						"moved_on": ("between", (start, add_days(today, 1))),
+					},
+					pluck="parent",
+				)
+			)
+		)
+
+	invoiced = collected = 0
+	company = frappe.db.get_single_value("Coach Work Settings", "company")
+	money_filters = {"docstatus": 1, "posting_date": between}
+	if company:
+		money_filters["company"] = company
+	# invoiced and collected are the company's whole month, the figures an owner checks
+	if frappe.has_permission("Sales Invoice", "read"):
+		invoiced = sum(
+			flt(v)
+			for v in frappe.get_list(
+				"Sales Invoice", filters=money_filters, pluck="grand_total", limit_page_length=0
+			)
+		)
+	if frappe.has_permission("Payment Entry", "read"):
+		collected = sum(
+			flt(v)
+			for v in frappe.get_list(
+				"Payment Entry",
+				filters={**money_filters, "payment_type": "Receive", "party_type": "Customer"},
+				pluck="received_amount",
+				limit_page_length=0,
+			)
+		)
+	return {
+		"received": received,
+		"delivered": delivered,
+		"invoiced": flt(invoiced, 2),
+		"collected": flt(collected, 2),
+		"from": str(start),
+	}
